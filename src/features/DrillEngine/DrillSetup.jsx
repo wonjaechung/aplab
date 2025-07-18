@@ -1,3 +1,5 @@
+// src/features/DrillEngine/DrillSetup.jsx
+
 import React, { useState } from 'react';
 import { Search, ChevronDown } from 'lucide-react';
 
@@ -30,7 +32,7 @@ export default function DrillSetup({ onStartDrill, questions, filterOptions }) {
         if (!questions) return 0;
         return questions.filter(q =>
             (selectedYears.length === 0 || selectedYears.includes(q.year)) &&
-            (selectedTypes.length === 0 || (q.tags && selectedTypes.includes(q.tags.type))) &&
+            (selectedTypes.length === 0 || (q.tags && q.tags.some(tag => selectedTypes.includes(tag)))) &&
             (selectedDifficulties.length === 0 || selectedDifficulties.includes(q.difficulty))
         ).length;
     };
@@ -38,7 +40,7 @@ export default function DrillSetup({ onStartDrill, questions, filterOptions }) {
     const handleStart = () => {
         const filtered = questions.filter(q =>
             (selectedYears.length === 0 || selectedYears.includes(q.year)) &&
-            (selectedTypes.length === 0 || (q.tags && selectedTypes.includes(q.tags.type))) &&
+            (selectedTypes.length === 0 || (q.tags && q.tags.some(tag => selectedTypes.includes(tag)))) &&
             (selectedDifficulties.length === 0 || selectedDifficulties.includes(q.difficulty))
         );
         onStartDrill(filtered);
@@ -57,18 +59,13 @@ export default function DrillSetup({ onStartDrill, questions, filterOptions }) {
             </AccordionSection>
 
             <AccordionSection title="QUESTION TYPES">
-                {Object.entries(filterOptions.tags).map(([family, types]) => (
-                    <div key={family} className="mb-4 last:mb-0">
-                        <h4 className="font-semibold text-gray-400 mb-3">{family}</h4>
-                        <div className="flex flex-wrap gap-2">
-                            {types.map(type => (
-                                <button key={type} onClick={() => handleToggle(setSelectedTypes, type)} className={`px-3 py-1 border rounded-md transition-colors ${selectedTypes.includes(type) ? 'bg-blue-600 border-blue-500 text-white' : 'border-gray-600 hover:bg-gray-700'}`}>
-                                    {type}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                ))}
+                <div className="flex flex-wrap gap-2">
+                    {filterOptions.tags.map(type => (
+                        <button key={type} onClick={() => handleToggle(setSelectedTypes, type)} className={`px-3 py-1 border rounded-md transition-colors ${selectedTypes.includes(type) ? 'bg-blue-600 border-blue-500 text-white' : 'border-gray-600 hover:bg-gray-700'}`}>
+                            {type}
+                        </button>
+                    ))}
+                </div>
             </AccordionSection>
             
             <AccordionSection title="DIFFICULTY">

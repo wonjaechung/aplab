@@ -9,22 +9,26 @@ export default function DrillPage() {
     const location = useLocation();
 
     const queryParams = new URLSearchParams(location.search);
+    // URL에 subject가 없으면 기본값으로 'econ'을 사용합니다.
     const initialSubject = queryParams.get('subject') || 'econ';
 
     const [currentSubject, setCurrentSubject] = useState(initialSubject);
 
+    // URL이 변경될 때마다 currentSubject 상태를 업데이트합니다.
     useEffect(() => {
         const subjectFromURL = queryParams.get('subject') || 'econ';
         if (subjectFromURL !== currentSubject) {
             setCurrentSubject(subjectFromURL);
         }
-    }, [location.search]);
+    }, [location.search, currentSubject]);
 
     const handleStartDrill = (filteredQuestions) => {
         const shuffled = [...filteredQuestions].sort(() => 0.5 - Math.random());
+        // 드릴 세션 페이지로 이동할 때 현재 과목 정보를 함께 전달합니다.
         navigate('/drill/session', { state: { questions: shuffled, subject: currentSubject } });
     };
     
+    // 현재 과목에 대한 정보를 가져옵니다.
     const subjectInfo = SUBJECTS[currentSubject] || SUBJECTS['econ'];
 
     return (
@@ -34,19 +38,10 @@ export default function DrillPage() {
                     <subjectInfo.logo className={`w-8 h-8 ${subjectInfo.theme.primary}`} />
                     <span>{subjectInfo.name} Drill</span>
                  </h1>
-                 <div className="flex gap-1 bg-gray-900/50 p-1 rounded-lg border border-gray-700">
-                    {Object.keys(SUBJECTS).map(key => (
-                         <button 
-                            key={key}
-                            onClick={() => navigate(`/drill?subject=${key}`)} 
-                            className={`px-4 py-2 rounded-md text-sm font-semibold transition-colors w-full sm:w-auto ${currentSubject === key ? `${SUBJECTS[key].theme.secondary} text-white` : 'text-gray-300 hover:bg-gray-700'}`}>
-                            {SUBJECTS[key].name}
-                        </button>
-                    ))}
-                 </div>
+                 {/* --- 다른 과목으로 전환하는 버튼 부분을 삭제했습니다 --- */}
             </div>
             
-            {/* DrillSetup에 올바른 props 전달 */}
+            {/* DrillSetup에 현재 과목에 맞는 props를 전달합니다. */}
             <DrillSetup
                 key={currentSubject} 
                 onStartDrill={handleStartDrill}

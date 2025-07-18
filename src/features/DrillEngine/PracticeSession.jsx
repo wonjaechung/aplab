@@ -16,9 +16,8 @@ export default function PracticeSession({ questions, onBack }) {
     }, [questions]);
 
     const currentQuestion = questions[currentQuestionIndex];
-    const currentStatus = questionStatuses[currentQuestionIndex]; // 이 부분을 수정합니다.
+    const currentStatus = questionStatuses[currentQuestionIndex];
 
-    // 👇 데이터가 준비되기 전에는 로딩 화면을 보여줍니다.
     if (!currentQuestion || !currentStatus) {
         return <div className="text-center text-white p-8">Loading...</div>;
     }
@@ -49,7 +48,14 @@ export default function PracticeSession({ questions, onBack }) {
     const showFeedback = currentStatus.status !== 'unanswered';
 
     const renderChart = (q) => {
-        const ChartComponent = StatCharts[q.chartType];
+        let ChartComponent;
+        // 경제 문제의 LineChart를 GenericLineChart로 렌더링하도록 수정
+        if (q.chartType === 'LineChart') {
+            ChartComponent = StatCharts['GenericLineChart'];
+        } else {
+            ChartComponent = StatCharts[q.chartType];
+        }
+        
         return ChartComponent ? <div className="my-6 p-4 bg-gray-800 rounded-lg border border-gray-700">{<ChartComponent data={q.chartData} />}</div> : null;
     };
 

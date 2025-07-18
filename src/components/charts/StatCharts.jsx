@@ -1,5 +1,5 @@
 import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Label, ScatterChart, Scatter } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Label, ScatterChart, Scatter, LineChart, Line } from 'recharts';
 
 const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
@@ -113,5 +113,17 @@ export const SegmentedBarChart = ({ data }) => (
             <Bar dataKey="Activity B" stackId="a" fill="#818cf8" />
             <Bar dataKey="Activity C" stackId="a" fill="#c7d2fe" />
         </BarChart>
+    </ResponsiveContainer>
+);
+
+export const GenericLineChart = ({ data }) => (
+    <ResponsiveContainer width="100%" height={300}>
+        <LineChart data={data.points} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+            <XAxis dataKey="x" type="number" domain={['dataMin - 1', 'dataMax + 1']} tick={{ fontSize: 12 }} label={{ value: data.xAxisLabel, position: 'bottom', offset: 0 }} />
+            <YAxis type="number" domain={['dataMin - 1', 'dataMax + 1']} tick={{ fontSize: 12 }} label={{ value: data.yAxisLabel, angle: -90, position: 'insideLeft' }} />
+            <Tooltip />
+            <Line type="monotone" dataKey="y" stroke="rgba(79, 70, 229, 1)" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+        </LineChart>
     </ResponsiveContainer>
 );
