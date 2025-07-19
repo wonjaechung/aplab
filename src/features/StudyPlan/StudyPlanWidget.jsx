@@ -2,44 +2,45 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { getStudyPlan, saveStudyPlan } from '../../api/studyPlan';
 
-const Widget = ({ title, children, style }) => (
-  <div style={{ height: '100%', backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '8px', padding: '20px', display: 'flex', flexDirection: 'column', ...style }}>
-    <h3 style={{ marginTop: 0, marginBottom: '20px', color: 'var(--text-secondary)', fontSize: '1rem', fontWeight: 600 }}>{title}</h3>
-    {children}
-  </div>
-);
-
-export default function StudyPlanWidget() {
+export default function StudyPlanWidget({ className = '', style = {} }) {
   const { currentUser } = useAuth();
   const [notes, setNotes] = useState('');
   const [status, setStatus] = useState('');
 
   useEffect(() => {
     if (currentUser) {
-      setStatus('로딩 중...');
+      setStatus('Loading...');
       getStudyPlan(currentUser.uid).then(savedNotes => {
-        setNotes(savedNotes);
+        setNotes(savedNotes || '');
         setStatus('');
-      });
+      }).catch(() => setStatus(''));
     }
   }, [currentUser]);
 
   const handleSave = () => {
-    setStatus('저장 중...');
+    if (!currentUser) return;
+    setStatus('Saving...');
     saveStudyPlan(currentUser.uid, notes)
-      .then(() => setStatus('저장 완료!'))
-      .catch(() => setStatus('저장 실패.'))
+      .then(() => setStatus('Saved!'))
+      .catch(() => setStatus('Save failed.'))
       .finally(() => setTimeout(() => setStatus(''), 2000));
   };
 
-  const textareaStyle = { flexGrow: 1, width: '100%', backgroundColor: 'var(--bg-primary)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', borderRadius: '4px', padding: '10px', resize: 'none', minHeight: '200px' };
-  const buttonStyle = { marginTop: '10px', padding: '10px', backgroundColor: 'var(--accent-color)', border: 'none', color: 'white', borderRadius: '4px', cursor: 'pointer' };
-
   return (
-    <Widget title="Study Plan">
-      <textarea style={textareaStyle} value={notes} onChange={e => setNotes(e.target.value)} placeholder="이번 주 학습 계획을 기록해보세요..." />
-      <button onClick={handleSave} style={buttonStyle}>계획 저장하기</button>
-      {status && <p style={{ textAlign: 'right', margin: '10px 0 0', color: 'var(--text-secondary)' }}>{status}</p>}
-    </Widget>
+    <div className={`bg-card border border-border-color rounded-xl p-6 h-full flex flex-col ${className}`} style={style}>
+        <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold text-text-primary">Study Notes</h2>
+            <span className="text-xs text-text-tertiary h-4">{status}</span>
+        </div>
+        <textarea 
+            className="flex-grow w-full bg-secondary border border-border-color text-text-primary rounded-md p-3 resize-none focus:ring-2 focus:ring-accent-primary outline-none transition" 
+            value={notes} 
+            onChange={e => setNotes(e.target.value)} 
+            placeholder="Write your study plans and notes here..." 
+        />
+        <button onClick={handleSave} className="w-full mt-4 bg-accent-primary hover:bg-accent-primary/90 rounded-md font-semibold text-white transition-colors py-2">
+            Save Notes
+        </button>
+    </div>
   );
 }
